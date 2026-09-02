@@ -16,6 +16,7 @@
   "scripts": {
     "check": "npm run check:repository && npm test",
     "check:repository": "node scripts/validate-repository.mjs",
+    "dev:relay": "npm run dev --workspace @watch-together/reference-relay --",
     "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {

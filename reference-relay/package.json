@@ -10,9 +10,11 @@
     "node": ">=22"
   },
   "scripts": {
+    "dev": "node ./src/development-relay-cli.js",
     "test": "node --test"
   },
   "dependencies": {
-    "@watch-together/protocol-core": "0.1.0"
+    "@watch-together/protocol-core": "0.1.0",
+    "ws": "8.21.3"
   }
 }
