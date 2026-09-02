@@ -70,13 +70,34 @@ and at least one independent protocol consumer.
 
 ## Phase 2 — Shared Kotlin client core
 
-Status: pending
+Status: complete, reviewed and approved 2026-09-03
 
 - Add transport-neutral protocol types to the NuvioMobile fork.
 - Consume the public conformance fixtures.
 - Implement relay-clock estimation, source-offset translation, ordering,
   deduplication, and compatibility fallback.
 - Keep player APIs behind a capability-based adapter.
+
+Implementation evidence:
+
+- The NuvioMobile common Kotlin source set now has strict service-manifest,
+  protocol-envelope, room-state, participant, readiness, round, and playback
+  models for protocol v1.
+- Contract validation rejects malformed payloads, unsafe protocol integers,
+  inconsistent snapshots, insecure manifest endpoints, and non-content-blind
+  services. Unsupported services fall back to local playback.
+- The shared core implements relay-clock estimation, canonical position
+  projection, local source offsets, server snapshot ordering, and message-ID
+  deduplication without a production transport dependency.
+- Player commands remain behind a capability-based adapter. Phase 2 does not
+  launch or modify a media player.
+- The Kotlin conformance runner consumes byte-identical copies of all four
+  public Phase 1 fixtures.
+- The isolated Watch Together suite passed 13 tests on both the iOS simulator
+  target and the Android host target.
+- [NuvioMobile PR 5](https://github.com/tinyKyuu/NuvioMobile/pull/5) merged as
+  commit `08619bd5a8a4a2af26ef2e437913a5a9802a8b73`.
+- The requester reviewed and approved Phase 2 on 2026-09-03.
 
 Exit evidence: Kotlin conformance tests pass without launching a media player.
 
