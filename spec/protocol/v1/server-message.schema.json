@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:watch-together:protocol:v1:server-message",
+  "title": "Watch Together server message v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "messageId",
+    "roomId",
+    "revision",
+    "relayTimeMs",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "urn:watch-together:protocol:v1:server-message"
+    },
+    "protocolVersion": {
+      "const": "1.0"
+    },
+    "messageId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "roomId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "relayTimeMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "type": {
+      "enum": [
+        "command.accepted",
+        "command.rejected",
+        "state.snapshot"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "command.accepted"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "payload": {
+            "$ref": "#/$defs/acceptedPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "command.rejected"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/rejectedPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "state.snapshot"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "payload": {
+            "$ref": "#/$defs/snapshotPayload"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "acceptedPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandMessageId",
+        "applied"
+      ],
+      "properties": {
+        "commandMessageId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "applied": {
+          "type": "boolean"
+        }
+      }
+    },
+    "rejectedPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandMessageId",
+        "code"
+      ],
+      "properties": {
+        "commandMessageId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "code": {
+          "enum": [
+            "ROOM_NOT_FOUND",
+            "ROOM_EXPIRED",
+            "PARTICIPANT_NOT_FOUND",
+            "SESSION_NOT_ACTIVE",
+            "STALE_SEQUENCE",
+            "ROUND_MISMATCH",
+            "MESSAGE_ID_REUSE",
+            "UNSUPPORTED_PROTOCOL",
+            "INVALID_COMMAND"
+          ]
+        }
+      }
+    },
+    "snapshotPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "properties": {
+        "state": {
+          "$ref": "urn:watch-together:protocol:v1:room-state"
+        }
+      }
+    }
+  }
+}

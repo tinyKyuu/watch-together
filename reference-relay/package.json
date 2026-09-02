@@ -1,0 +1,18 @@
+{
+  "name": "@watch-together/reference-relay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic in-memory reference relay for Watch Together",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": "./src/index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@watch-together/protocol-core": "0.1.0"
+  }
+}

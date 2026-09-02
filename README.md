@@ -8,9 +8,35 @@ content identity.
 
 ## Status
 
-Pre-alpha. The initial implementation target is an iOS-to-iOS vertical slice in
-the enhanced NuvioMobile fork, followed by Android and representative desktop
-adapters.
+Pre-alpha. Protocol v1 schemas, the deterministic state machine, conformance
+fixtures, and the in-memory reference relay are implemented for review. No
+production relay or media-client adapter exists in this repository yet.
+
+## Run the checks
+
+Use Node.js 22 or newer:
+
+```sh
+npm ci
+npm run check
+```
+
+The command validates the service manifest and protocol schemas, executes every
+conformance fixture, tests the canonical clock and room transitions, and tests
+the reference relay. It does not contact Supabase or play media.
+
+## Protocol v1 files
+
+- `spec/manifest/v1/manifest.schema.json` defines the installable service
+  manifest.
+- `spec/protocol/v1/` contains the client command, server message, and canonical
+  room-state schemas.
+- `spec/conformance/v1/fixture.schema.json` defines the fixture format.
+- `conformance/fixtures/v1/` contains deterministic shared examples.
+- `packages/protocol-core/` implements the dependency-free canonical clock and
+  pure state transitions.
+- `reference-relay/` implements the in-memory relay used by tests and client
+  development.
 
 ## Repository boundary
 

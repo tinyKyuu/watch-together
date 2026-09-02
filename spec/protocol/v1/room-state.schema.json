@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:watch-together:protocol:v1:room-state",
+  "title": "Watch Together canonical room state v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "roomId",
+    "revision",
+    "status",
+    "createdAtMs",
+    "expiresAtMs",
+    "capacity",
+    "hostParticipantId",
+    "admission",
+    "participants",
+    "round"
+  ],
+  "properties": {
+    "protocolVersion": {
+      "const": "1.0"
+    },
+    "roomId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "status": {
+      "enum": [
+        "open",
+        "closed"
+      ]
+    },
+    "createdAtMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "expiresAtMs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "capacity": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 8
+    },
+    "hostParticipantId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "inviteGeneration"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "open",
+            "paused"
+          ]
+        },
+        "inviteGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/participant"
+      }
+    },
+    "round": {
+      "$ref": "#/$defs/round"
+    }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "participantId",
+        "displayName",
+        "role",
+        "connection",
+        "readiness"
+      ],
+      "properties": {
+        "participantId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "displayName": {
+          "$ref": "#/$defs/displayName"
+        },
+        "role": {
+          "enum": [
+            "host",
+            "guest"
+          ]
+        },
+        "connection": {
+          "enum": [
+            "connected",
+            "disconnected"
+          ]
+        },
+        "readiness": {
+          "$ref": "#/$defs/readiness"
+        }
+      }
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "^(?=.*\\S)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundId",
+        "sourceReady",
+        "viewerReady",
+        "durationMs",
+        "durationMismatchAcknowledged"
+      ],
+      "properties": {
+        "roundId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "sourceReady": {
+          "type": "boolean"
+        },
+        "viewerReady": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "multipleOf": 1000
+        },
+        "durationMismatchAcknowledged": {
+          "type": "boolean"
+        }
+      }
+    },
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundId",
+        "generation",
+        "status",
+        "playback"
+      ],
+      "properties": {
+        "roundId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "enum": [
+            "preparing",
+            "countdown",
+            "active",
+            "ended"
+          ]
+        },
+        "playback": {
+          "$ref": "#/$defs/playback"
+        }
+      }
+    },
+    "playback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "anchorPositionMs",
+        "anchorRelayTimeMs",
+        "rate"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "paused",
+            "playing"
+          ]
+        },
+        "anchorPositionMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "anchorRelayTimeMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "rate": {
+          "const": 1
+        }
+      }
+    }
+  }
+}

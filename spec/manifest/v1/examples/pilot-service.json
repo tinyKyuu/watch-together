@@ -1,0 +1,56 @@
+{
+  "$schema": "urn:watch-together:manifest:v1",
+  "schemaVersion": "1.0",
+  "id": "io.github.tinykyuu.watch-together",
+  "name": "Watch Together Pilot",
+  "description": "Invitation-only, content-blind playback synchronization pilot.",
+  "canonicalOrigin": "https://watch.example.invalid",
+  "protocolVersions": [
+    "1.0"
+  ],
+  "endpoints": {
+    "relayWebSocketUrl": "wss://relay.watch.example.invalid/v1",
+    "accountLinkUrl": "https://watch.example.invalid/link",
+    "supportUrl": "https://watch.example.invalid/support"
+  },
+  "operator": {
+    "name": "tinyKyuu",
+    "websiteUrl": "https://github.com/tinyKyuu/watch-together",
+    "contactUrl": "https://github.com/tinyKyuu/watch-together/security"
+  },
+  "privacy": {
+    "policyUrl": "https://watch.example.invalid/privacy",
+    "contentBlind": true,
+    "operationalDataCategories": [
+      "network_address",
+      "account_identifier",
+      "device_session_identifier",
+      "room_display_name",
+      "room_operational_metrics",
+      "client_platform",
+      "diagnostic_errors"
+    ]
+  },
+  "authentication": {
+    "host": {
+      "mode": "email_otp_device_link",
+      "accountRequired": true
+    },
+    "guest": {
+      "mode": "room_credential",
+      "accountRequired": false
+    }
+  },
+  "capabilities": [
+    "room.create",
+    "room.join",
+    "room.approve_guest",
+    "room.rotate_invitation",
+    "playback.pause",
+    "playback.resume",
+    "playback.seek",
+    "participant.readiness",
+    "round.multiple",
+    "source.local_offset"
+  ]
+}
