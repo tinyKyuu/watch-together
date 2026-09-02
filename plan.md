@@ -31,7 +31,7 @@ approved decision ledger, with a local validation command and passing CI.
 
 ## Phase 1 — Deterministic protocol core
 
-Status: implemented — awaiting review
+Status: complete — reviewed and approved 2026-09-03
 
 - Define the service-manifest v1 schema and trust-sensitive fields.
 - Define protocol envelopes, identifiers, ordering, and version negotiation.
@@ -60,6 +60,10 @@ Implementation evidence:
 - GitHub Actions run
   [33642608811](https://github.com/tinyKyuu/watch-together/actions/runs/33642608811)
   passed for commit `1b0b028a740dee81480a883295c97e67fef06922`.
+- GitHub Actions run
+  [33642723531](https://github.com/tinyKyuu/watch-together/actions/runs/33642723531)
+  passed for review head `d7a02f33ef3c451be091b1644dc6902dcaa0bb9a`.
+- The requester reviewed and approved Phase 1 on 2026-09-03.
 
 Exit evidence: identical expected state transitions across the reference relay
 and at least one independent protocol consumer.
