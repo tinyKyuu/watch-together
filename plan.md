@@ -5,13 +5,20 @@ This plan begins from the approved Watch Together decision checkpoint dated
 
 ## Phase 0 — Repository foundation
 
-Status: active
+Status: implemented — awaiting review
 
 - Establish Apache-2.0 licensing and project attribution.
 - Document public, client-specific, and private-operations boundaries.
 - Add protocol, conformance, SDK, and reference-relay directories.
 - Select the smallest toolchain needed to validate schemas and fixtures.
 - Add CI only after the validation command works locally.
+
+Implementation evidence:
+
+- `npm run check` validates the required repository boundary files and every
+  checked-in JSON document without external dependencies.
+- `.github/workflows/validate.yml` runs the same command for pushes to `main`
+  and pull requests using Node.js 22.
 
 Exit evidence: a clean public repository whose documented boundaries match the
 approved decision ledger, with a local validation command and passing CI.

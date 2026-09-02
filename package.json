@@ -1,0 +1,16 @@
+{
+  "name": "watch-together",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Provider-neutral protocol for synchronizing playback across compatible media clients",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "npm run check:repository && npm test",
+    "check:repository": "node scripts/validate-repository.mjs",
+    "test": "node --test"
+  }
+}
