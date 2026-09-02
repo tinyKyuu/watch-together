@@ -1,0 +1,17 @@
+{
+  "name": "@watch-together/protocol-core",
+  "version": "0.1.0",
+  "description": "Deterministic canonical clock and room-state transitions for Watch Together",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -31,7 +31,7 @@ approved decision ledger, with a local validation command and passing CI.
 
 ## Phase 1 — Deterministic protocol core
 
-Status: ready — not started
+Status: implemented — awaiting review
 
 - Define the service-manifest v1 schema and trust-sensitive fields.
 - Define protocol envelopes, identifiers, ordering, and version negotiation.
@@ -40,6 +40,23 @@ Status: ready — not started
 - Add deterministic fixtures for pause, resume, seek, reconnect, and stale-event
   rejection.
 - Implement an in-memory reference relay without Supabase dependencies.
+
+Implementation evidence:
+
+- JSON Schema 2020-12 contracts define the service manifest, client commands,
+  server messages, canonical room state, and conformance fixture format.
+- The dependency-free protocol core implements immutable room transitions and a
+  relay-owned millisecond playback anchor.
+- Four deterministic fixtures cover pause and resume, seek and idempotency,
+  reconnect and stale-event rejection, readiness, and multiple rounds.
+- The in-memory relay and an independent snapshot consumer produce the same
+  expected state for every fixture.
+- Room snapshots remain content-blind. They expose room-scoped participant IDs
+  and display names, connection state, readiness, duration, and playback state,
+  but no content or stream identity.
+- `npm run check` passes 18 reported tests with Node.js 26.3.0 and npm 11.16.0.
+  The protocol-core package also passes `npm pack --dry-run`.
+- `npm audit` reports zero known vulnerabilities for the pinned dependency set.
 
 Exit evidence: identical expected state transitions across the reference relay
 and at least one independent protocol consumer.

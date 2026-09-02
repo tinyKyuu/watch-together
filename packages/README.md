@@ -1,5 +1,6 @@
 # Reusable packages
 
-Reusable SDK and state-machine packages will live here after the Phase 0
-toolchain decision. The repository will not add a monorepo framework until more
-than one independently versioned package requires it.
+`protocol-core` is the dependency-free canonical clock and pure room-state
+transition package. JSON Schemas and conformance fixtures remain the
+language-neutral source of truth; this JavaScript package is the first reference
+consumer, not a replacement for those contracts.

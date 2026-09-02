@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:watch-together:protocol:v1:client-command",
+  "title": "Watch Together client command v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "messageId",
+    "roomId",
+    "roundId",
+    "participantId",
+    "sessionId",
+    "sequence",
+    "sentAtMs",
+    "type",
+    "payload"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "urn:watch-together:protocol:v1:client-command"
+    },
+    "protocolVersion": {
+      "const": "1.0"
+    },
+    "messageId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "roomId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "roundId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "participantId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "sessionId": {
+      "$ref": "#/$defs/opaqueId"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "sentAtMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "type": {
+      "enum": [
+        "playback.pause",
+        "playback.resume",
+        "playback.seek",
+        "participant.readiness"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "playback.pause",
+              "playback.resume"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/emptyPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "playback.seek"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/seekPayload"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "participant.readiness"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/readinessPayload"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "emptyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 0
+    },
+    "seekPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positionMs"
+      ],
+      "properties": {
+        "positionMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "readinessPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceReady",
+        "viewerReady",
+        "durationMs",
+        "durationMismatchAcknowledged"
+      ],
+      "properties": {
+        "sourceReady": {
+          "type": "boolean"
+        },
+        "viewerReady": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "multipleOf": 1000
+        },
+        "durationMismatchAcknowledged": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

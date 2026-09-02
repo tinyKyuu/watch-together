@@ -1,0 +1,400 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:watch-together:conformance:v1:fixture",
+  "title": "Watch Together conformance fixture v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "name",
+    "clockStartMs",
+    "room",
+    "participants",
+    "steps"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "urn:watch-together:conformance:v1:fixture"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "clockStartMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "room": {
+      "$ref": "#/$defs/room"
+    },
+    "participants": {
+      "type": "array",
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/participant"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "room": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roomId",
+        "hostParticipantId",
+        "hostDisplayName",
+        "hostSessionId",
+        "roundId",
+        "capacity",
+        "lifetimeMs"
+      ],
+      "properties": {
+        "roomId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "hostParticipantId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "hostDisplayName": {
+          "$ref": "#/$defs/displayName"
+        },
+        "hostSessionId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "roundId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 8
+        },
+        "lifetimeMs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "participantId",
+        "displayName",
+        "sessionId"
+      ],
+      "properties": {
+        "participantId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "displayName": {
+          "$ref": "#/$defs/displayName"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/opaqueId"
+        }
+      }
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "^(?=.*\\S)[^\\u0000-\\u001F\\u007F]+$"
+    },
+    "responseExpectation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "applied",
+            "revision"
+          ],
+          "properties": {
+            "type": {
+              "const": "command.accepted"
+            },
+            "applied": {
+              "type": "boolean"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "sameAs": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "code",
+            "revision"
+          ],
+          "properties": {
+            "type": {
+              "const": "command.rejected"
+            },
+            "code": {
+              "$ref": "urn:watch-together:protocol:v1:server-message#/$defs/rejectedPayload/properties/code"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "sameAs": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "readinessExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceReady",
+        "viewerReady",
+        "durationMs",
+        "durationMismatchAcknowledged"
+      ],
+      "properties": {
+        "sourceReady": {
+          "type": "boolean"
+        },
+        "viewerReady": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "multipleOf": 1000
+        },
+        "durationMismatchAcknowledged": {
+          "type": "boolean"
+        }
+      }
+    },
+    "stateExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "roundId": {
+          "$ref": "#/$defs/opaqueId"
+        },
+        "roundGeneration": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "roundStatus": {
+          "enum": [
+            "preparing",
+            "countdown",
+            "active",
+            "ended"
+          ]
+        },
+        "playbackMode": {
+          "enum": [
+            "paused",
+            "playing"
+          ]
+        },
+        "canonicalPositionMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "participant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "participantId"
+          ],
+          "properties": {
+            "participantId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "connection": {
+              "enum": [
+                "connected",
+                "disconnected"
+              ]
+            },
+            "readiness": {
+              "$ref": "#/$defs/readinessExpectation"
+            }
+          }
+        }
+      }
+    },
+    "step": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "byMs"
+          ],
+          "properties": {
+            "op": {
+              "const": "advance"
+            },
+            "byMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "command",
+            "expect"
+          ],
+          "properties": {
+            "op": {
+              "const": "command"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "command": {
+              "$ref": "urn:watch-together:protocol:v1:client-command"
+            },
+            "expect": {
+              "$ref": "#/$defs/responseExpectation"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "participantId",
+            "sessionId",
+            "revision"
+          ],
+          "properties": {
+            "op": {
+              "const": "disconnect"
+            },
+            "participantId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "sessionId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "participantId",
+            "sessionId",
+            "revision"
+          ],
+          "properties": {
+            "op": {
+              "const": "reconnect"
+            },
+            "participantId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "sessionId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "roundId",
+            "revision"
+          ],
+          "properties": {
+            "op": {
+              "const": "nextRound"
+            },
+            "roundId": {
+              "$ref": "#/$defs/opaqueId"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "expect"
+          ],
+          "properties": {
+            "op": {
+              "const": "assert"
+            },
+            "expect": {
+              "$ref": "#/$defs/stateExpectation"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
