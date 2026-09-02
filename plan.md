@@ -57,6 +57,9 @@ Implementation evidence:
 - `npm run check` passes 18 reported tests with Node.js 26.3.0 and npm 11.16.0.
   The protocol-core package also passes `npm pack --dry-run`.
 - `npm audit` reports zero known vulnerabilities for the pinned dependency set.
+- GitHub Actions run
+  [33642608811](https://github.com/tinyKyuu/watch-together/actions/runs/33642608811)
+  passed for commit `1b0b028a740dee81480a883295c97e67fef06922`.
 
 Exit evidence: identical expected state transitions across the reference relay
 and at least one independent protocol consumer.
