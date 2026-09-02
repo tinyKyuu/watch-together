@@ -5,7 +5,7 @@ This plan begins from the approved Watch Together decision checkpoint dated
 
 ## Phase 0 — Repository foundation
 
-Status: implemented — awaiting review
+Status: complete — reviewed and approved 2026-09-02
 
 - Establish Apache-2.0 licensing and project attribution.
 - Document public, client-specific, and private-operations boundaries.
@@ -19,13 +19,19 @@ Implementation evidence:
   checked-in JSON document without external dependencies.
 - `.github/workflows/validate.yml` runs the same command for pushes to `main`
   and pull requests using Node.js 22.
+- Local `npm run check` passed with Node.js 26.3.0 and npm 11.16.0.
+- GitHub Actions run
+  [33637707115](https://github.com/tinyKyuu/watch-together/actions/runs/33637707115)
+  passed for commit `9ae9baf9247eb863fe3c075fd434ef22c429b912`.
+- The requester reviewed and approved the Phase 0 repository foundation on
+  2026-09-02.
 
 Exit evidence: a clean public repository whose documented boundaries match the
 approved decision ledger, with a local validation command and passing CI.
 
 ## Phase 1 — Deterministic protocol core
 
-Status: pending
+Status: ready — not started
 
 - Define the service-manifest v1 schema and trust-sensitive fields.
 - Define protocol envelopes, identifiers, ordering, and version negotiation.
