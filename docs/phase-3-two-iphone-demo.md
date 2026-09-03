@@ -34,10 +34,10 @@ Do not expose the plain `ws://` development server to the public internet.
 4. On phone A, tap **Create room** and note the eight-character code.
 5. On phone B, enter that code and tap **Join room**.
 
-The development room starts paused at `00:00`. This intentionally provides a
-deterministic baseline before the later readiness gate and countdown exist.
-The panel should list both room-scoped names as connected. It must not display
-or send a title, episode identifier, provider, debrid service, or source URL.
+The development room starts paused at the host's current playback position.
+The host stays at that point, and the guest aligns to it after joining. The
+panel should list both room-scoped names as connected. It must not display or
+send a title, episode identifier, provider, debrid service, or source URL.
 
 ## Exercise collaborative controls
 

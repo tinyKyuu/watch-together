@@ -45,6 +45,7 @@ export class InMemoryRelay {
     capacity,
     createdAtMs = this.#now(),
     expiresAtMs,
+    initialPositionMs = 0,
   }) {
     requireSessionId(hostSessionId);
     if (this.#rooms.has(roomId)) {
@@ -58,6 +59,7 @@ export class InMemoryRelay {
       capacity,
       createdAtMs,
       expiresAtMs,
+      initialPositionMs,
     });
     this.#rooms.set(roomId, {
       state,

@@ -38,6 +38,23 @@ test("room transitions are immutable and revisioned", () => {
   assert.equal(rotated.revision, 4);
 });
 
+test("a room starts paused at the host's current position", () => {
+  const state = createRoomState({
+    roomId: "room_test_0002",
+    hostParticipantId: "host_test_0002",
+    hostDisplayName: "Host",
+    roundId: "round_test_0002",
+    createdAtMs: 2000,
+    expiresAtMs: 21602000,
+    capacity: 2,
+    initialPositionMs: 3_725_000,
+  });
+
+  assert.equal(state.round.playback.mode, "paused");
+  assert.equal(state.round.playback.anchorPositionMs, 3_725_000);
+  assert.equal(state.round.playback.anchorRelayTimeMs, 2000);
+});
+
 test("a new round resets transient readiness without exposing content identity", () => {
   const joined = addParticipant(room(), "guest_test_0001", "Guest");
   const next = beginRound(joined, {

@@ -3,11 +3,12 @@
 import { ProtocolError } from "./errors.js";
 import { requireNonNegativeInteger } from "./validation.js";
 
-export function createPlaybackAnchor(relayTimeMs) {
+export function createPlaybackAnchor(relayTimeMs, initialPositionMs = 0) {
   requireNonNegativeInteger(relayTimeMs, "relayTimeMs");
+  requireNonNegativeInteger(initialPositionMs, "initialPositionMs");
   return {
     mode: "paused",
-    anchorPositionMs: 0,
+    anchorPositionMs: initialPositionMs,
     anchorRelayTimeMs: relayTimeMs,
     rate: 1,
   };

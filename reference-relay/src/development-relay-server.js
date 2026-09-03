@@ -29,6 +29,14 @@ function cleanRoomCode(value) {
   return result;
 }
 
+function cleanInitialPositionMs(value) {
+  if (value === undefined) return 0;
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new Error("initialPositionMs must be a non-negative integer");
+  }
+  return value;
+}
+
 function send(socket, value) {
   if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(value));
 }
@@ -145,6 +153,7 @@ export class DevelopmentRelayServer {
     const roundId = opaqueId("round");
     const roomCode = this.#createRoomCode();
     const nowMs = this.#now();
+    const initialPositionMs = cleanInitialPositionMs(request.initialPositionMs);
 
     this.#relay.createRoom({
       roomId,
@@ -155,6 +164,7 @@ export class DevelopmentRelayServer {
       capacity: 2,
       createdAtMs: nowMs,
       expiresAtMs: nowMs + ROOM_LIFETIME_MS,
+      initialPositionMs,
     });
     this.#roomCodes.set(roomCode, roomId);
     this.#sessions.set(this.#sessionKey(roomId, participantId), reconnectToken);

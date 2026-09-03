@@ -57,9 +57,16 @@ test("two clients can create, join, synchronize, and reconnect without media ide
   const host = await connect(url);
   context.after(() => host.terminate());
   const hostInbox = inbox(host);
-  send(host, { type: "room.create", requestId: "create-1", displayName: "Host" });
+  send(host, {
+    type: "room.create",
+    requestId: "create-1",
+    displayName: "Host",
+    initialPositionMs: 72_345,
+  });
   const hostReady = await hostInbox.next((message) => message.type === "session.ready");
   assert.match(hostReady.roomCode, /^[23456789A-HJ-NP-Z]{8}$/u);
+  assert.equal(hostReady.snapshot.payload.state.round.playback.mode, "paused");
+  assert.equal(hostReady.snapshot.payload.state.round.playback.anchorPositionMs, 72_345);
 
   const guest = await connect(url);
   const guestInbox = inbox(guest);
@@ -70,6 +77,7 @@ test("two clients can create, join, synchronize, and reconnect without media ide
     displayName: "Guest",
   });
   const guestReady = await guestInbox.next((message) => message.type === "session.ready");
+  assert.equal(guestReady.snapshot.payload.state.round.playback.anchorPositionMs, 72_345);
   const joined = await hostInbox.next(
     (message) =>
       message.type === "protocol.message" &&
@@ -101,7 +109,7 @@ test("two clients can create, join, synchronize, and reconnect without media ide
       message.message.type === "state.snapshot" &&
       message.message.payload.state.round.playback.mode === "playing",
   );
-  assert.equal(resumed.message.payload.state.round.playback.anchorPositionMs, 0);
+  assert.equal(resumed.message.payload.state.round.playback.anchorPositionMs, 72_345);
 
   relayTimeMs = 14_000;
   send(host, {

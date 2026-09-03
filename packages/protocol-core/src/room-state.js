@@ -50,6 +50,7 @@ export function createRoomState({
   createdAtMs,
   expiresAtMs,
   capacity,
+  initialPositionMs = 0,
 }) {
   requireOpaqueId(roomId, "roomId");
   requireOpaqueId(hostParticipantId, "hostParticipantId");
@@ -59,6 +60,7 @@ export function createRoomState({
   );
   requireOpaqueId(roundId, "roundId");
   requireNonNegativeInteger(createdAtMs, "createdAtMs");
+  requireNonNegativeInteger(initialPositionMs, "initialPositionMs");
   requirePositiveInteger(expiresAtMs, "expiresAtMs");
   if (expiresAtMs <= createdAtMs) {
     throw new ProtocolError("INVALID_COMMAND", "expiresAtMs must follow createdAtMs");
@@ -93,7 +95,7 @@ export function createRoomState({
       roundId,
       generation: 1,
       status: "preparing",
-      playback: createPlaybackAnchor(createdAtMs),
+      playback: createPlaybackAnchor(createdAtMs, initialPositionMs),
     },
   };
 }
