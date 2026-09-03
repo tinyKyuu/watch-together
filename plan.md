@@ -103,13 +103,42 @@ Exit evidence: Kotlin conformance tests pass without launching a media player.
 
 ## Phase 3 — iOS-to-iOS vertical slice
 
-Status: pending
+Status: complete, reviewed and approved 2026-09-03
 
 - Connect two iOS clients through the deterministic development relay.
 - Create and join one anonymous room.
 - Synchronize pause, resume, absolute seek, and reconnect.
 - Use independent local media sources and a relay-owned canonical clock.
 - Measure player timestamp precision and correction behavior.
+
+Implementation evidence:
+
+- An iPhone 13 mini simulator and an iPad Pro simulator created and joined a
+  content-blind room using independently selected sources.
+- Pause, resume, collaborative seeking, 10-second jumps, canonical clock
+  synchronization, and reconnect recovery worked in both directions.
+- Forced reconnect showed the temporary disconnect and restored the
+  participant automatically.
+- The centered, bounded, scrollable Watch Together dialog remained readable
+  and usable in the dark theme on both screen sizes.
+- Room codes could be copied and entered in the `ABCD-EFGH` format.
+- Creating a room preserved the host's current playback position. The guest
+  aligned to that position instead of resetting both players to `0:00`.
+- The relay remained content-blind. Room creation sent only playback position
+  and room-scoped identity data, with no title, episode, provider, source URL,
+  debrid identity, or viewing-history identifier.
+- The public protocol and relay suites passed 22 tests. The focused iOS and
+  Android host Watch Together suites passed 17 tests per target, and the iOS
+  simulator compile and unsigned simulator build passed.
+- Simulator build 123 was installed on both test simulators.
+- [watch-together PR 2](https://github.com/tinyKyuu/watch-together/pull/2)
+  merged into `main` as commit
+  `f8d011f98a376846b7a0908f6b5913e3e1941e4b`.
+- [NuvioMobile PR 6](https://github.com/tinyKyuu/NuvioMobile/pull/6)
+  merged into `codex/testflight-internal` as commit
+  `33998f878bfabc4aff190ac7aba41eae4fb796af`.
+- Physical-device testing is intentionally deferred. The requester accepted
+  the simulator evidence for Phase 3 on 2026-09-03.
 
 Exit evidence: a repeatable two-device demonstration with recorded drift and
 recovery measurements.
