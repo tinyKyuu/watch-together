@@ -66,6 +66,18 @@ The name has at most 40 characters and helps people recognize each other during
 admission and playback. It is not an account name, and a relay must not treat
 either field as a stable identity across rooms.
 
+A readiness gate is content-blind. It requires connected participants, a
+loaded source, viewer confirmation, and a duration rounded to a whole second.
+The default duration tolerance is three seconds. A larger spread requires
+explicit acknowledgement from every participant or a deliberate host
+override.
+
+A synchronized countdown is represented by relay start and end timestamps in
+the round state. Version 1 uses a five-second default. Playback remains paused
+during the countdown, and any participant may cancel it. Completion anchors
+playing time to the scheduled countdown end rather than message-delivery time.
+Starting another round clears countdown and readiness state.
+
 ## State snapshots
 
 The canonical state includes room lifetime and capacity, host identity,

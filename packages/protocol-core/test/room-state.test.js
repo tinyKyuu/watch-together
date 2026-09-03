@@ -4,8 +4,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   addParticipant,
+  beginCountdown,
   beginRound,
+  cancelCountdown,
+  completeCountdown,
   createRoomState,
+  evaluateReadinessGate,
+  reduceRoomCommand,
   rotateInvitation,
   setAdmissionState,
 } from "../src/index.js";
@@ -96,4 +101,135 @@ test("display names are room-scoped, trimmed, and bounded", () => {
     () => addParticipant(room(), "guest_test_0001", "x".repeat(41)),
     /1 to 40 visible characters/,
   );
+});
+
+function readinessCommand({ participantId, sequence, durationMs, acknowledged = false }) {
+  return {
+    protocolVersion: "1.0",
+    messageId: `message_${participantId}_${sequence}`,
+    roomId: "room_test_0001",
+    roundId: "round_test_0001",
+    participantId,
+    sessionId: `session_${participantId}`,
+    sequence,
+    sentAtMs: 10_000,
+    type: "participant.readiness",
+    payload: {
+      sourceReady: true,
+      viewerReady: true,
+      durationMs,
+      durationMismatchAcknowledged: acknowledged,
+    },
+  };
+}
+
+function readyRoom({ hostDurationMs = 3_600_000, guestDurationMs = 3_602_000 } = {}) {
+  let state = addParticipant(room(), "guest_test_0001", "Guest");
+  state = reduceRoomCommand(
+    state,
+    readinessCommand({
+      participantId: "host_test_0001",
+      sequence: 1,
+      durationMs: hostDurationMs,
+    }),
+    10_000,
+  ).state;
+  state = reduceRoomCommand(
+    state,
+    readinessCommand({
+      participantId: "guest_test_0001",
+      sequence: 1,
+      durationMs: guestDurationMs,
+    }),
+    10_000,
+  ).state;
+  return state;
+}
+
+test("readiness gates require connected viewers, loaded sources, and known durations", () => {
+  const state = addParticipant(room(), "guest_test_0001", "Guest");
+  const gate = evaluateReadinessGate(state);
+
+  assert.equal(gate.ready, false);
+  assert.deepEqual(gate.sourcePendingParticipantIds, [
+    "host_test_0001",
+    "guest_test_0001",
+  ]);
+  assert.deepEqual(gate.durationPendingParticipantIds, [
+    "host_test_0001",
+    "guest_test_0001",
+  ]);
+});
+
+test("duration differences within three seconds can enter the shared countdown", () => {
+  const state = readyRoom();
+  const gate = evaluateReadinessGate(state);
+  assert.equal(gate.ready, true);
+  assert.equal(gate.durationSpreadMs, 2_000);
+  assert.equal(gate.durationMismatch, false);
+
+  const countdown = beginCountdown(state, { acceptedAtMs: 12_000 });
+  assert.equal(countdown.round.status, "countdown");
+  assert.deepEqual(countdown.round.countdown, {
+    startedAtRelayTimeMs: 12_000,
+    endsAtRelayTimeMs: 17_000,
+  });
+  assert.equal(countdown.round.playback.mode, "paused");
+
+  assert.throws(
+    () => completeCountdown(countdown, { acceptedAtMs: 16_999 }),
+    /countdown has not finished/,
+  );
+  const active = completeCountdown(countdown, { acceptedAtMs: 17_250 }).state;
+  assert.equal(active.round.status, "active");
+  assert.equal(active.round.countdown, null);
+  assert.equal(active.round.playback.mode, "playing");
+  assert.equal(active.round.playback.anchorRelayTimeMs, 17_000);
+});
+
+test("any pending viewer can cancel a countdown without changing playback position", () => {
+  const countdown = beginCountdown(readyRoom(), { acceptedAtMs: 12_000 });
+  const cancelled = cancelCountdown(countdown);
+
+  assert.equal(cancelled.applied, true);
+  assert.equal(cancelled.state.round.status, "preparing");
+  assert.equal(cancelled.state.round.countdown, null);
+  assert.equal(cancelled.state.round.playback.mode, "paused");
+  assert.equal(cancelCountdown(cancelled.state).applied, false);
+});
+
+test("duration mismatches require acknowledgement from every participant", () => {
+  let state = readyRoom({ guestDurationMs: 3_606_000 });
+  let gate = evaluateReadinessGate(state);
+  assert.equal(gate.durationMismatch, true);
+  assert.equal(gate.durationSpreadMs, 6_000);
+  assert.equal(gate.ready, false);
+  assert.deepEqual(gate.mismatchUnacknowledgedParticipantIds, [
+    "host_test_0001",
+    "guest_test_0001",
+  ]);
+
+  state = reduceRoomCommand(
+    state,
+    readinessCommand({
+      participantId: "host_test_0001",
+      sequence: 2,
+      durationMs: 3_600_000,
+      acknowledged: true,
+    }),
+    11_000,
+  ).state;
+  state = reduceRoomCommand(
+    state,
+    readinessCommand({
+      participantId: "guest_test_0001",
+      sequence: 2,
+      durationMs: 3_606_000,
+      acknowledged: true,
+    }),
+    11_000,
+  ).state;
+  gate = evaluateReadinessGate(state);
+  assert.equal(gate.ready, true);
+  assert.deepEqual(gate.mismatchUnacknowledgedParticipantIds, []);
 });

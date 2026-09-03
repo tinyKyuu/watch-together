@@ -221,6 +221,8 @@
           "playback.resume",
           "playback.seek",
           "participant.readiness",
+          "round.readiness_gate",
+          "round.countdown",
           "round.multiple",
           "source.local_offset"
         ]

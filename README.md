@@ -40,6 +40,8 @@ the reference relay. It does not contact Supabase or play media.
   development.
 - `docs/phase-3-two-iphone-demo.md` is the repeatable device checklist for the
   first native two-client demonstration.
+- `docs/phase-4-hosted-pilot.md` records the active invitation-only pilot
+  contract and its public/private implementation boundary.
 
 ## Repository boundary
 
