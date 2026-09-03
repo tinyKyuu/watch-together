@@ -119,6 +119,9 @@ export class DevelopmentRelayServer {
         case "clock.ping":
           this.#clockPing(socket, request, requestId);
           break;
+        case "session.drop":
+          this.#dropSession(socket);
+          break;
         default:
           throw new Error("unsupported request type");
       }
@@ -220,6 +223,11 @@ export class DevelopmentRelayServer {
       clientSentAtMs: request.clientSentAtMs,
       relayTimeMs: this.#now(),
     });
+  }
+
+  #dropSession(socket) {
+    this.#requireBound(socket);
+    socket.terminate();
   }
 
   #sendReady(socket, requestId, reconnectToken) {

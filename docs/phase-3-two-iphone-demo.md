@@ -56,12 +56,24 @@ corrects; clients do not chase one another.
 
 ## Exercise reconnect
 
+For the repeatable development check, open the Watch Together panel on phone B
+and tap **Test reconnect**. The relay closes only that phone's socket. Confirm
+phone A shows phone B as disconnected, then confirm phone B changes from
+**Reconnecting** to **Connected**, keeps the same participant identity, and
+returns to the canonical position. Repeat while paused and after an absolute
+seek.
+
+Then perform one real network check:
+
 1. While playing, disable Wi-Fi on phone B for at least three seconds.
 2. Confirm phone A shows phone B as disconnected and continues playing.
 3. Re-enable Wi-Fi.
 4. Confirm phone B changes from **Reconnecting** to **Connected**, keeps the
    same participant identity, and returns to the canonical position.
 5. Repeat while paused and after an absolute seek.
+
+Do not use simulator backgrounding as the reconnect check. A simulator may keep
+an active WebSocket alive after the app moves to the Home Screen.
 
 An ordinary disconnect does not pause the room. This prevents a sleeping app,
 brief radio change, or poor connection from repeatedly interrupting everyone.

@@ -207,3 +207,36 @@ test("clock pings return relay time only to active sessions", async (context) =>
     relayTimeMs: 42_000,
   });
 });
+
+test("a development client can force a transport loss and reconnect", async (context) => {
+  const server = new DevelopmentRelayServer({ port: 0, now: () => 55_000 });
+  const address = await server.start();
+  context.after(() => server.stop());
+  const url = `ws://127.0.0.1:${address.port}`;
+
+  const firstSocket = await connect(url);
+  const firstInbox = inbox(firstSocket);
+  send(firstSocket, { type: "room.create", requestId: "create-drop", displayName: "Host" });
+  const firstReady = await firstInbox.next((message) => message.type === "session.ready");
+  const closed = new Promise((resolve) => firstSocket.once("close", resolve));
+
+  send(firstSocket, { type: "session.drop", requestId: "drop-1" });
+  await closed;
+
+  const reconnectedSocket = await connect(url);
+  context.after(() => reconnectedSocket.terminate());
+  const reconnectedInbox = inbox(reconnectedSocket);
+  send(reconnectedSocket, {
+    type: "session.reconnect",
+    requestId: "reconnect-drop",
+    roomId: firstReady.roomId,
+    participantId: firstReady.participantId,
+    reconnectToken: firstReady.reconnectToken,
+  });
+  const reconnected = await reconnectedInbox.next(
+    (message) => message.type === "session.ready",
+  );
+
+  assert.equal(reconnected.participantId, firstReady.participantId);
+  assert.notEqual(reconnected.sessionId, firstReady.sessionId);
+});
