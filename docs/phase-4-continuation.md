@@ -45,17 +45,16 @@ updates. The new `wt_join_status` function lets a pending guest observe host
 approval or rejection without calling `wt_request_join` again. It binds the
 room and participant IDs to the caller's Auth principal.
 
-The join-status migration is deployed, but its first runtime validation stopped
-at the RPC permission assertion. Supabase retained a direct `anon` execute
-grant after the migration revoked `PUBLIC`. The test transaction removed all
-fixtures, and Realtime and lint checks did not run after the database gate
-failed.
+The join-status and direct role-grant corrections are deployed. All 45 database
+assertions passed. A live private-Realtime test admitted the authorized
+principal, rejected pending and unrelated principals, delivered the private
+broadcast, and removed all temporary Auth and database records.
 
-The operations branch now needs a new reviewed forward migration that revokes
-the role-specific grant without rewriting the deployed migration. Apply only
-that correction, then rerun all 45 transactional assertions, the live private
-Realtime test for admitted, pending, and unrelated principals, lint, and
-cleanup.
+Lint then caught a function-metadata mismatch: `wt_join_status` is declared
+`STABLE` but uses volatile `clock_timestamp()` expiry checks. The operations
+branch needs one more reviewed forward migration marking that RPC `VOLATILE`
+without rewriting deployed history. Apply only that correction, then rerun the
+database, Realtime, lint, and cleanup gates.
 
 ## Next client validation
 
