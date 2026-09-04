@@ -8,9 +8,14 @@
   "protocolVersions": [
     "1.0"
   ],
+  "transports": [
+    {
+      "profile": "supabase_direct_v1",
+      "projectUrl": "https://example-project.supabase.co",
+      "publishableKey": "sb_publishable_example_public_key_0000000000"
+    }
+  ],
   "endpoints": {
-    "relayWebSocketUrl": "wss://relay.watch.example.invalid/v1",
-    "accountLinkUrl": "https://watch.example.invalid/link",
     "supportUrl": "https://watch.example.invalid/support"
   },
   "operator": {
@@ -33,7 +38,7 @@
   },
   "authentication": {
     "host": {
-      "mode": "email_otp_device_link",
+      "mode": "email_otp",
       "accountRequired": true
     },
     "guest": {

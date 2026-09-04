@@ -14,12 +14,32 @@ capability, and operational-data declarations before installation.
 The manifest URL and every endpoint must be free of account tokens, room codes,
 invitation secrets, and device credentials.
 
+## Transport profiles
+
+The manifest declares one or more transport profiles. Protocol messages remain
+the same across profiles, and clients use an isolated adapter for each profile
+they support. A client must reject a manifest when none of its declared
+profiles are supported.
+
+The hosted pilot uses `supabase_direct_v1`. Its `projectUrl` identifies the
+HTTPS service origin. Its `publishableKey` is Supabase's public client key,
+which is intended to ship in clients and does not grant privileged database
+access. The schema accepts only the `sb_publishable_` form and rejects secret
+server keys. Authentication, row-level authorization, and private Realtime
+policies remain mandatory even though the public key is visible.
+
+`email_otp` means the compatible client collects an approved host email and a
+typed one-time code. `email_otp_device_link` is a separate mode that requires
+an `accountLinkUrl`. The hosted pilot starts with direct typed OTP and may add
+device linking later without pretending that the linking page already exists.
+
 ## Trust-sensitive changes
 
 An installed service requires renewed user confirmation before accepting:
 
 - a changed canonical origin or operator identity;
-- a changed endpoint origin;
+- a changed transport profile, project origin, public client key, or endpoint
+  origin;
 - a new host or guest authentication requirement;
 - an added capability;
 - an added operational-data category; or

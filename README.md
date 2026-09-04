@@ -9,9 +9,11 @@ content identity.
 ## Status
 
 Pre-alpha. Protocol v1 schemas, the deterministic state machine, conformance
-fixtures, the in-memory reference relay, and a local WebSocket development
-transport are implemented for review. No production relay or media-client
-adapter exists in this repository yet.
+fixtures, the in-memory reference relay, the local WebSocket development
+transport, and the provider-neutral hosted transport declaration are
+implemented for review. The Nuvio fork has the Phase 4 hosted client adapter;
+the private pilot deployment and its remaining validation stay outside this
+repository.
 
 ## Run the checks
 
