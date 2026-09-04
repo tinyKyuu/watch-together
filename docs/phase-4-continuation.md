@@ -45,10 +45,17 @@ updates. The new `wt_join_status` function lets a pending guest observe host
 approval or rejection without calling `wt_request_join` again. It binds the
 room and participant IDs to the caller's Auth principal.
 
-The migration is not deployed. Its dry run identifies exactly that one file.
-After independent review, apply only that migration, run all 45 transactional
-assertions, repeat the live private-Realtime test for admitted, pending, and
-unrelated principals, lint the database, and remove all temporary test data.
+The join-status migration is deployed, but its first runtime validation stopped
+at the RPC permission assertion. Supabase retained a direct `anon` execute
+grant after the migration revoked `PUBLIC`. The test transaction removed all
+fixtures, and Realtime and lint checks did not run after the database gate
+failed.
+
+The operations branch now needs a new reviewed forward migration that revokes
+the role-specific grant without rewriting the deployed migration. Apply only
+that correction, then rerun all 45 transactional assertions, the live private
+Realtime test for admitted, pending, and unrelated principals, lint, and
+cleanup.
 
 ## Next client validation
 
