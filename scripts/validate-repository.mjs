@@ -18,6 +18,8 @@ const requiredFiles = [
   "docs/architecture.md",
   "docs/protocol-v1.md",
   "docs/service-manifest-v1.md",
+  "docs/pilot-privacy.md",
+  "pilot/manifest.json",
   "spec/README.md",
   "spec/manifest/v1/manifest.schema.json",
   "spec/manifest/v1/examples/pilot-service.json",

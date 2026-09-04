@@ -112,8 +112,9 @@ offsets remain only on each device and are never transmitted.
 - [x] Nuvio hosted transport adapter and secure credential storage.
 - [x] Readiness, countdown, mismatch, multiple-round, and local-offset UI.
 - [x] Privacy-preserving client metrics and documented server-data boundary.
-- [ ] Deploy and validate the dedicated join-status polling function.
-- [ ] Publish the reviewed pilot manifest URL and public client key.
+- [x] Deploy and validate the dedicated join-status polling function.
+- [ ] Publish and independently review the pilot manifest URL and public client
+  key.
 - [ ] Run a two-client hosted simulator test through the real pilot project.
 - [ ] Friends-and-family test evidence within the zero-cost boundary.
 

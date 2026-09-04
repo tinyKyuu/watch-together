@@ -1,0 +1,63 @@
+{
+  "$schema": "urn:watch-together:manifest:v1",
+  "schemaVersion": "1.0",
+  "id": "io.github.tinykyuu.watch-together.pilot",
+  "name": "Watch Together Pilot",
+  "description": "Invitation-only, content-blind playback synchronization pilot operated by tinyKyuu.",
+  "canonicalOrigin": "https://ahhncxbqqniygqlpdejl.supabase.co",
+  "protocolVersions": [
+    "1.0"
+  ],
+  "transports": [
+    {
+      "profile": "supabase_direct_v1",
+      "projectUrl": "https://ahhncxbqqniygqlpdejl.supabase.co",
+      "publishableKey": "sb_publishable_8YByTA-D0IxvyaNKsZ-mfw_yaZJCS37"
+    }
+  ],
+  "endpoints": {
+    "supportUrl": "https://github.com/tinyKyuu/watch-together/issues"
+  },
+  "operator": {
+    "name": "tinyKyuu",
+    "websiteUrl": "https://github.com/tinyKyuu/watch-together",
+    "contactUrl": "https://github.com/tinyKyuu/watch-together/blob/main/SECURITY.md"
+  },
+  "privacy": {
+    "policyUrl": "https://github.com/tinyKyuu/watch-together/blob/main/docs/pilot-privacy.md",
+    "contentBlind": true,
+    "operationalDataCategories": [
+      "network_address",
+      "account_identifier",
+      "device_session_identifier",
+      "room_display_name",
+      "room_operational_metrics",
+      "client_platform",
+      "diagnostic_errors"
+    ]
+  },
+  "authentication": {
+    "host": {
+      "mode": "email_otp",
+      "accountRequired": true
+    },
+    "guest": {
+      "mode": "room_credential",
+      "accountRequired": false
+    }
+  },
+  "capabilities": [
+    "room.create",
+    "room.join",
+    "room.approve_guest",
+    "room.rotate_invitation",
+    "playback.pause",
+    "playback.resume",
+    "playback.seek",
+    "participant.readiness",
+    "round.readiness_gate",
+    "round.countdown",
+    "round.multiple",
+    "source.local_offset"
+  ]
+}

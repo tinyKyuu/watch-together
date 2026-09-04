@@ -64,9 +64,9 @@ final independent review and explicit merge approval.
 
 After Operations PR 2 passes final review and is merged:
 
-1. Review the real pilot manifest URL and publishable key before exposing them
-   in a public artifact.
-2. Install the manifest through the Nuvio Settings entry on two simulators.
+1. Review the real pilot manifest, privacy notice, URL, and publishable key.
+2. Install the immutable review manifest through the Nuvio Settings entry on
+   two simulators. Switch to the permanent `main` URL after merge.
 3. Verify host OTP, room creation before source selection, guest approval and
    rejection, reconnect after app restart, readiness, countdown, pause, resume,
    seek, duration mismatch acknowledgement, local offset, and a second round.

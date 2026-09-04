@@ -77,6 +77,24 @@ test("the pilot service manifest conforms to manifest v1", async () => {
   assert.equal(validate(linkedDeviceService), true, validationMessage(validate));
 });
 
+test("the deployed pilot manifest conforms to manifest v1", async () => {
+  const schema = await readJson("spec/manifest/v1/manifest.schema.json");
+  const manifest = await readJson("pilot/manifest.json");
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  const validate = ajv.compile(schema);
+
+  assert.equal(validate(manifest), true, validationMessage(validate));
+  assert.equal(
+    manifest.canonicalOrigin,
+    "https://ahhncxbqqniygqlpdejl.supabase.co",
+  );
+  assert.equal(manifest.transports.length, 1);
+  assert.equal(manifest.transports[0].profile, "supabase_direct_v1");
+  assert.match(manifest.transports[0].publishableKey, /^sb_publishable_/);
+  assert.doesNotMatch(JSON.stringify(manifest), /sb_secret_/);
+});
+
 test("every conformance fixture matches the language-neutral schemas", async () => {
   const [command, roomState, serverMessage, fixtureSchema] = await Promise.all([
     readJson("spec/protocol/v1/client-command.schema.json"),

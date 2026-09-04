@@ -32,6 +32,8 @@ the reference relay. It does not contact Supabase or play media.
 
 - `spec/manifest/v1/manifest.schema.json` defines the installable service
   manifest.
+- `pilot/manifest.json` is the reviewed installation manifest for the hosted
+  invitation-only pilot. It contains only the public Supabase client key.
 - `spec/protocol/v1/` contains the client command, server message, and canonical
   room-state schemas.
 - `spec/conformance/v1/fixture.schema.json` defines the fixture format.
@@ -44,6 +46,8 @@ the reference relay. It does not contact Supabase or play media.
   first native two-client demonstration.
 - `docs/phase-4-hosted-pilot.md` records the active invitation-only pilot
   contract and its public/private implementation boundary.
+- `docs/pilot-privacy.md` explains the pilot's data handling and current
+  retention limits.
 
 ## Repository boundary
 
