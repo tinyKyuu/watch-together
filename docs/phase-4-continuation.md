@@ -46,7 +46,7 @@ approval or rejection without calling `wt_request_join` again. It binds the
 room and participant IDs to the caller's Auth principal.
 
 The migration is not deployed. Its dry run identifies exactly that one file.
-After independent review, apply only that migration, run all 38 transactional
+After independent review, apply only that migration, run all 45 transactional
 assertions, repeat the live private-Realtime test for admitted, pending, and
 unrelated principals, lint the database, and remove all temporary test data.
 
