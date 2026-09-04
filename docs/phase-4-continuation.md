@@ -2,9 +2,9 @@
 
 Date: 2026-09-04
 
-Phase 4 has a complete client-side hosted-pilot path and one pending database
-migration. Do not mark the phase complete until the real hosted tests and the
-friends-and-family run pass.
+Phase 4 has a complete client-side hosted-pilot path and a validated database
+deployment. Do not mark the phase complete until the real hosted client tests
+and the friends-and-family run pass.
 
 ## Completed
 
@@ -37,28 +37,32 @@ friends-and-family run pass.
 - The focused Watch Together suite passes on the iOS Simulator and Android host
   targets. The latest recorded run contains 42 tests per target.
 
-## Pending database review
+## Database validation checkpoint
 
-The operations branch `codex/phase-4-host-rejection` contains only the forward
-migration `20260904130000_join_status_api.sql` plus its test and documentation
-updates. The new `wt_join_status` function lets a pending guest observe host
-approval or rejection without calling `wt_request_join` again. It binds the
-room and participant IDs to the caller's Auth principal.
+The operations branch `codex/phase-4-host-rejection` adds the forward-only
+join-status, direct role-grant, and function-volatility migrations plus their
+tests and documentation. The new `wt_join_status` function lets a pending guest
+observe host approval or rejection without calling `wt_request_join` again. It
+binds the room and participant IDs to the caller's Auth principal.
 
-The join-status and direct role-grant corrections are deployed. All 45 database
-assertions passed. A live private-Realtime test admitted the authorized
-principal, rejected pending and unrelated principals, delivered the private
-broadcast, and removed all temporary Auth and database records.
+All three corrections through
+`20260904162500_mark_join_status_volatile.sql` are deployed. The first exact
+post-migration database run reported two unnamed failures; a rollback-safe
+diagnostic found no failed assertions or leaked fixtures, and the exact
+committed 45-assertion suite then passed three consecutive times. A final live
+private-Realtime test admitted the authorized principal, rejected pending and
+unrelated principals, delivered the private broadcast, and removed all
+temporary Auth and database records.
 
-Lint then caught a function-metadata mismatch: `wt_join_status` is declared
-`STABLE` but uses volatile `clock_timestamp()` expiry checks. The operations
-branch needs one more reviewed forward migration marking that RPC `VOLATILE`
-without rewriting deployed history. Apply only that correction, then rerun the
-database, Realtime, lint, and cleanup gates.
+Live metadata confirms the function is `VOLATILE`, keeps its hardened security
+settings, denies `anon`, and permits `authenticated`. Lint no longer reports the
+join-status mismatch; only unchanged pre-existing warnings remain. Migration
+histories match and the remote project is current. Operations PR 2 now needs
+final independent review and explicit merge approval.
 
 ## Next client validation
 
-After the database gate passes:
+After Operations PR 2 passes final review and is merged:
 
 1. Review the real pilot manifest URL and publishable key before exposing them
    in a public artifact.
