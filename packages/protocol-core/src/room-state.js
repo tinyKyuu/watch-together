@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  canonicalPositionAt,
   createPlaybackAnchor,
   pausePlayback,
   resumePlayback,
@@ -14,6 +15,9 @@ import {
   requireOpaqueId,
   requirePositiveInteger,
 } from "./validation.js";
+
+export const DEFAULT_COUNTDOWN_DURATION_MS = 5_000;
+export const DEFAULT_DURATION_TOLERANCE_MS = 3_000;
 
 function readinessFor(roundId) {
   return {
@@ -95,6 +99,7 @@ export function createRoomState({
       roundId,
       generation: 1,
       status: "preparing",
+      countdown: null,
       playback: createPlaybackAnchor(createdAtMs, initialPositionMs),
     },
   };
@@ -147,6 +152,7 @@ export function beginRound(state, { roundId, acceptedAtMs }) {
     roundId,
     generation: incrementSafeInteger(state.round.generation, "round generation"),
     status: "preparing",
+    countdown: null,
     playback: createPlaybackAnchor(acceptedAtMs),
   };
   next.participants = next.participants.map((participant) => ({
@@ -154,6 +160,119 @@ export function beginRound(state, { roundId, acceptedAtMs }) {
     readiness: readinessFor(roundId),
   }));
   return bump(next);
+}
+
+export function evaluateReadinessGate(
+  state,
+  { durationToleranceMs = DEFAULT_DURATION_TOLERANCE_MS } = {},
+) {
+  requireNonNegativeInteger(durationToleranceMs, "durationToleranceMs");
+  const participants = state.participants;
+  const disconnectedParticipantIds = participants
+    .filter((participant) => participant.connection !== "connected")
+    .map((participant) => participant.participantId);
+  const sourcePendingParticipantIds = participants
+    .filter((participant) => !participant.readiness.sourceReady)
+    .map((participant) => participant.participantId);
+  const viewerPendingParticipantIds = participants
+    .filter((participant) => !participant.readiness.viewerReady)
+    .map((participant) => participant.participantId);
+  const durationPendingParticipantIds = participants
+    .filter((participant) => participant.readiness.durationMs === null)
+    .map((participant) => participant.participantId);
+  const durations = participants
+    .map((participant) => participant.readiness.durationMs)
+    .filter((durationMs) => durationMs !== null);
+  const durationSpreadMs = durations.length > 1
+    ? Math.max(...durations) - Math.min(...durations)
+    : 0;
+  const durationMismatch = durationSpreadMs > durationToleranceMs;
+  const mismatchUnacknowledgedParticipantIds = durationMismatch
+    ? participants
+      .filter((participant) => !participant.readiness.durationMismatchAcknowledged)
+      .map((participant) => participant.participantId)
+    : [];
+
+  return {
+    ready:
+      disconnectedParticipantIds.length === 0 &&
+      sourcePendingParticipantIds.length === 0 &&
+      viewerPendingParticipantIds.length === 0 &&
+      durationPendingParticipantIds.length === 0 &&
+      mismatchUnacknowledgedParticipantIds.length === 0,
+    durationToleranceMs,
+    durationSpreadMs,
+    durationMismatch,
+    disconnectedParticipantIds,
+    sourcePendingParticipantIds,
+    viewerPendingParticipantIds,
+    durationPendingParticipantIds,
+    mismatchUnacknowledgedParticipantIds,
+  };
+}
+
+export function beginCountdown(
+  state,
+  {
+    acceptedAtMs,
+    countdownDurationMs = DEFAULT_COUNTDOWN_DURATION_MS,
+    durationToleranceMs = DEFAULT_DURATION_TOLERANCE_MS,
+  },
+) {
+  requireNonNegativeInteger(acceptedAtMs, "acceptedAtMs");
+  requirePositiveInteger(countdownDurationMs, "countdownDurationMs");
+  if (state.round.status !== "preparing") {
+    throw new ProtocolError("INVALID_COMMAND", "a countdown can only begin while preparing");
+  }
+  if (state.round.playback.mode !== "paused") {
+    throw new ProtocolError("INVALID_COMMAND", "a countdown requires paused playback");
+  }
+  const gate = evaluateReadinessGate(state, { durationToleranceMs });
+  if (!gate.ready) {
+    throw new ProtocolError("READINESS_REQUIRED", "all participants must pass the readiness gate");
+  }
+  const endsAtRelayTimeMs = acceptedAtMs + countdownDurationMs;
+  if (!Number.isSafeInteger(endsAtRelayTimeMs)) {
+    throw new ProtocolError("INVALID_COMMAND", "countdown end exceeds the safe integer range");
+  }
+  const next = clone(state);
+  next.round.status = "countdown";
+  next.round.countdown = {
+    startedAtRelayTimeMs: acceptedAtMs,
+    endsAtRelayTimeMs,
+  };
+  next.round.playback = {
+    ...next.round.playback,
+    anchorPositionMs: canonicalPositionAt(next.round.playback, acceptedAtMs),
+    anchorRelayTimeMs: acceptedAtMs,
+  };
+  return bump(next);
+}
+
+export function cancelCountdown(state) {
+  if (state.round.status !== "countdown") return { state, applied: false };
+  const next = clone(state);
+  next.round.status = "preparing";
+  next.round.countdown = null;
+  return { state: bump(next), applied: true };
+}
+
+export function completeCountdown(state, { acceptedAtMs }) {
+  requireNonNegativeInteger(acceptedAtMs, "acceptedAtMs");
+  if (state.round.status !== "countdown") return { state, applied: false };
+  const countdown = state.round.countdown;
+  if (!countdown || acceptedAtMs < countdown.endsAtRelayTimeMs) {
+    throw new ProtocolError("COUNTDOWN_ACTIVE", "the countdown has not finished");
+  }
+  const next = clone(state);
+  next.round.status = "active";
+  next.round.countdown = null;
+  next.round.playback = {
+    ...next.round.playback,
+    mode: "playing",
+    anchorRelayTimeMs: countdown.endsAtRelayTimeMs,
+  };
+  return { state: bump(next), applied: true };
 }
 
 export function setAdmissionState(state, admissionState) {

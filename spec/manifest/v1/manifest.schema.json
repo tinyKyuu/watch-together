@@ -11,6 +11,7 @@
     "description",
     "canonicalOrigin",
     "protocolVersions",
+    "transports",
     "endpoints",
     "operator",
     "privacy",
@@ -52,18 +53,23 @@
         "const": "1.0"
       }
     },
+    "transports": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/supabaseDirectTransport"
+          }
+        ]
+      }
+    },
     "endpoints": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "relayWebSocketUrl"
-      ],
       "properties": {
-        "relayWebSocketUrl": {
-          "type": "string",
-          "format": "uri",
-          "pattern": "^wss://(?![^/?#]*@)[^?#]+$"
-        },
         "accountLinkUrl": {
           "type": "string",
           "format": "uri",
@@ -159,6 +165,7 @@
             "mode": {
               "enum": [
                 "none",
+                "email_otp",
                 "email_otp_device_link"
               ]
             },
@@ -174,6 +181,16 @@
                 },
                 "accountRequired": {
                   "const": false
+                }
+              }
+            },
+            {
+              "properties": {
+                "mode": {
+                  "const": "email_otp"
+                },
+                "accountRequired": {
+                  "const": true
                 }
               }
             },
@@ -221,6 +238,8 @@
           "playback.resume",
           "playback.seek",
           "participant.readiness",
+          "round.readiness_gate",
+          "round.countdown",
           "round.multiple",
           "source.local_offset"
         ]
@@ -273,5 +292,31 @@
         }
       }
     }
-  ]
+  ],
+  "$defs": {
+    "supabaseDirectTransport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "projectUrl",
+        "publishableKey"
+      ],
+      "properties": {
+        "profile": {
+          "const": "supabase_direct_v1"
+        },
+        "projectUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^@/?#]+/?$"
+        },
+        "publishableKey": {
+          "type": "string",
+          "pattern": "^sb_publishable_[A-Za-z0-9_-]{20,200}$",
+          "maxLength": 215
+        }
+      }
+    }
+  }
 }

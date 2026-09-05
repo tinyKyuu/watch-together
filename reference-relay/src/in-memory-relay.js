@@ -3,7 +3,9 @@
 import {
   ProtocolError,
   addParticipant,
+  beginCountdown,
   beginRound,
+  completeCountdown,
   createRoomState,
   reduceRoomCommand,
   rotateInvitation,
@@ -129,6 +131,18 @@ export class InMemoryRelay {
     }
     room.state = beginRound(room.state, { roundId, acceptedAtMs });
     room.usedRoundIds.add(roundId);
+    return this.snapshot(roomId);
+  }
+
+  beginCountdown({ roomId, acceptedAtMs = this.#now() }) {
+    const room = this.#requireRoom(roomId);
+    room.state = beginCountdown(room.state, { acceptedAtMs });
+    return this.snapshot(roomId);
+  }
+
+  completeCountdown({ roomId, acceptedAtMs = this.#now() }) {
+    const room = this.#requireRoom(roomId);
+    room.state = completeCountdown(room.state, { acceptedAtMs }).state;
     return this.snapshot(roomId);
   }
 

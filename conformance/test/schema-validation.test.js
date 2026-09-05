@@ -33,15 +33,20 @@ test("the pilot service manifest conforms to manifest v1", async () => {
   undeclaredData.privacy.viewingHistory = true;
   assert.equal(validate(undeclaredData), false);
 
-  const tokenizedEndpoint = structuredClone(manifest);
-  tokenizedEndpoint.endpoints.relayWebSocketUrl =
-    "wss://relay.watch.example.invalid/v1?token=secret";
-  assert.equal(validate(tokenizedEndpoint), false);
+  const tokenizedProjectUrl = structuredClone(manifest);
+  tokenizedProjectUrl.transports[0].projectUrl =
+    "https://example-project.supabase.co?token=secret";
+  assert.equal(validate(tokenizedProjectUrl), false);
 
-  const credentialedEndpoint = structuredClone(manifest);
-  credentialedEndpoint.endpoints.relayWebSocketUrl =
-    "wss://username:password@relay.watch.example.invalid/v1";
-  assert.equal(validate(credentialedEndpoint), false);
+  const credentialedProjectUrl = structuredClone(manifest);
+  credentialedProjectUrl.transports[0].projectUrl =
+    "https://username:password@example-project.supabase.co";
+  assert.equal(validate(credentialedProjectUrl), false);
+
+  const secretServerKey = structuredClone(manifest);
+  secretServerKey.transports[0].publishableKey =
+    "sb_secret_this_must_never_appear_in_a_manifest";
+  assert.equal(validate(secretServerKey), false);
 
   const contradictoryAuthentication = structuredClone(manifest);
   contradictoryAuthentication.authentication.host = {
@@ -55,12 +60,39 @@ test("the pilot service manifest conforms to manifest v1", async () => {
     mode: "none",
     accountRequired: false,
   };
-  delete accountlessService.endpoints.accountLinkUrl;
   assert.equal(
     validate(accountlessService),
     true,
     validationMessage(validate),
   );
+
+  const linkedDeviceService = structuredClone(manifest);
+  linkedDeviceService.authentication.host = {
+    mode: "email_otp_device_link",
+    accountRequired: true,
+  };
+  assert.equal(validate(linkedDeviceService), false);
+  linkedDeviceService.endpoints.accountLinkUrl =
+    "https://watch.example.invalid/link";
+  assert.equal(validate(linkedDeviceService), true, validationMessage(validate));
+});
+
+test("the deployed pilot manifest conforms to manifest v1", async () => {
+  const schema = await readJson("spec/manifest/v1/manifest.schema.json");
+  const manifest = await readJson("pilot/manifest.json");
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  const validate = ajv.compile(schema);
+
+  assert.equal(validate(manifest), true, validationMessage(validate));
+  assert.equal(
+    manifest.canonicalOrigin,
+    "https://ahhncxbqqniygqlpdejl.supabase.co",
+  );
+  assert.equal(manifest.transports.length, 1);
+  assert.equal(manifest.transports[0].profile, "supabase_direct_v1");
+  assert.match(manifest.transports[0].publishableKey, /^sb_publishable_/);
+  assert.doesNotMatch(JSON.stringify(manifest), /sb_secret_/);
 });
 
 test("every conformance fixture matches the language-neutral schemas", async () => {

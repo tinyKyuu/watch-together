@@ -154,6 +154,8 @@
             "SESSION_NOT_ACTIVE",
             "STALE_SEQUENCE",
             "ROUND_MISMATCH",
+            "READINESS_REQUIRED",
+            "COUNTDOWN_ACTIVE",
             "MESSAGE_ID_REUSE",
             "UNSUPPORTED_PROTOCOL",
             "INVALID_COMMAND"

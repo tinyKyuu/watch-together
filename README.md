@@ -9,9 +9,11 @@ content identity.
 ## Status
 
 Pre-alpha. Protocol v1 schemas, the deterministic state machine, conformance
-fixtures, the in-memory reference relay, and a local WebSocket development
-transport are implemented for review. No production relay or media-client
-adapter exists in this repository yet.
+fixtures, the in-memory reference relay, the local WebSocket development
+transport, and the provider-neutral hosted transport declaration are
+implemented for review. The Nuvio fork has the Phase 4 hosted client adapter;
+the private pilot deployment and its remaining validation stay outside this
+repository.
 
 ## Run the checks
 
@@ -30,6 +32,8 @@ the reference relay. It does not contact Supabase or play media.
 
 - `spec/manifest/v1/manifest.schema.json` defines the installable service
   manifest.
+- `pilot/manifest.json` is the reviewed installation manifest for the hosted
+  invitation-only pilot. It contains only the public Supabase client key.
 - `spec/protocol/v1/` contains the client command, server message, and canonical
   room-state schemas.
 - `spec/conformance/v1/fixture.schema.json` defines the fixture format.
@@ -40,6 +44,10 @@ the reference relay. It does not contact Supabase or play media.
   development.
 - `docs/phase-3-two-iphone-demo.md` is the repeatable device checklist for the
   first native two-client demonstration.
+- `docs/phase-4-hosted-pilot.md` records the active invitation-only pilot
+  contract and its public/private implementation boundary.
+- `docs/pilot-privacy.md` explains the pilot's data handling and current
+  retention limits.
 
 ## Repository boundary
 

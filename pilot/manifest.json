@@ -1,30 +1,30 @@
 {
   "$schema": "urn:watch-together:manifest:v1",
   "schemaVersion": "1.0",
-  "id": "io.github.tinykyuu.watch-together",
+  "id": "io.github.tinykyuu.watch-together.pilot",
   "name": "Watch Together Pilot",
-  "description": "Invitation-only, content-blind playback synchronization pilot.",
-  "canonicalOrigin": "https://watch.example.invalid",
+  "description": "Invitation-only, content-blind playback synchronization pilot operated by tinyKyuu.",
+  "canonicalOrigin": "https://ahhncxbqqniygqlpdejl.supabase.co",
   "protocolVersions": [
     "1.0"
   ],
   "transports": [
     {
       "profile": "supabase_direct_v1",
-      "projectUrl": "https://example-project.supabase.co",
-      "publishableKey": "sb_publishable_example_public_key_0000000000"
+      "projectUrl": "https://ahhncxbqqniygqlpdejl.supabase.co",
+      "publishableKey": "sb_publishable_8YByTA-D0IxvyaNKsZ-mfw_yaZJCS37"
     }
   ],
   "endpoints": {
-    "supportUrl": "https://watch.example.invalid/support"
+    "supportUrl": "https://github.com/tinyKyuu/watch-together/issues"
   },
   "operator": {
     "name": "tinyKyuu",
     "websiteUrl": "https://github.com/tinyKyuu/watch-together",
-    "contactUrl": "https://github.com/tinyKyuu/watch-together/security"
+    "contactUrl": "https://github.com/tinyKyuu/watch-together/blob/main/SECURITY.md"
   },
   "privacy": {
-    "policyUrl": "https://watch.example.invalid/privacy",
+    "policyUrl": "https://github.com/tinyKyuu/watch-together/blob/main/docs/pilot-privacy.md",
     "contentBlind": true,
     "operationalDataCategories": [
       "network_address",

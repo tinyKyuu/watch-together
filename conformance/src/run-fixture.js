@@ -36,6 +36,18 @@ function assertState(state, consumer, expectation, nowMs) {
   if (expectation.canonicalPositionMs !== undefined) {
     assert.equal(consumer.canonicalPositionAt(nowMs), expectation.canonicalPositionMs);
   }
+  if (expectation.countdownStartedAtRelayTimeMs !== undefined) {
+    assert.equal(
+      state.round.countdown?.startedAtRelayTimeMs,
+      expectation.countdownStartedAtRelayTimeMs,
+    );
+  }
+  if (expectation.countdownEndsAtRelayTimeMs !== undefined) {
+    assert.equal(
+      state.round.countdown?.endsAtRelayTimeMs,
+      expectation.countdownEndsAtRelayTimeMs,
+    );
+  }
   if (expectation.participant) {
     const participant = state.participants.find(
       (candidate) => candidate.participantId === expectation.participant.participantId,
@@ -119,6 +131,24 @@ export function runFixture(fixture, { onServerMessage = () => {} } = {}) {
           const state = relay.startNextRound({
             roomId: room.roomId,
             roundId: step.roundId,
+            acceptedAtMs: nowMs,
+          });
+          assert.equal(state.revision, step.revision);
+          syncConsumer();
+          break;
+        }
+        case "beginCountdown": {
+          const state = relay.beginCountdown({
+            roomId: room.roomId,
+            acceptedAtMs: nowMs,
+          });
+          assert.equal(state.revision, step.revision);
+          syncConsumer();
+          break;
+        }
+        case "completeCountdown": {
+          const state = relay.completeCountdown({
+            roomId: room.roomId,
             acceptedAtMs: nowMs,
           });
           assert.equal(state.revision, step.revision);
